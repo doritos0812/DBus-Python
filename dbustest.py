@@ -206,6 +206,15 @@ class DisplayConfig():
     def max_screen_height(self):
         return self.resources[5]
 
+    
+    def available_modes(self, monitor):
+        # print("Available Monitor Modes")
+        modes = monitor[1]
+        mode_list = [str(mode[0]) for mode in modes]
+        return mode_list
+
+
+
     def print_monitor_config(self, monitor):
         print("Print Monitor Config")
         monitor_info, modes, props = monitor
@@ -240,6 +249,8 @@ class DisplayConfig():
         print("Serial: %s" % serial)
         print("Monitors num:",len(monitors))
         for monitor in monitors:
+            print("Available Monitor Modes")
+            print(self.available_modes(monitor))
             self.print_monitor_config(monitor)
         print("Logical monitors")
         for monitor in logical_monitors:
@@ -333,18 +344,24 @@ if __name__ == "__main__":
     display_config = DisplayConfig()
     # display_config.print_monitor()
     display_config.print_current_state()
+
     # print('====================')
     # display_config.print_resources()
     # display_config.apply_monitors_config()
     # display_config = DisplayConfig()
 
-    def catchcall_signal_handler(*args, **kwargs):
-        display_config = DisplayConfig()
-        display_config.print_current_state()
+
+
+
+
+    # # --------- DBus Loop -----------
+    # def catchcall_signal_handler(*args, **kwargs):
+    #     display_config = DisplayConfig()
+    #     display_config.print_current_state()
         
 
-    bus = dbus.SessionBus()
-    bus.add_signal_receiver(catchcall_signal_handler, dbus_interface="org.gnome.Mutter.DisplayConfig", signal_name='MonitorsChanged')
+    # bus = dbus.SessionBus()
+    # bus.add_signal_receiver(catchcall_signal_handler, dbus_interface="org.gnome.Mutter.DisplayConfig", signal_name='MonitorsChanged')
 
-    loop = GLib.MainLoop()
-    loop.run()
+    # loop = GLib.MainLoop()
+    # loop.run()
