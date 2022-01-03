@@ -206,6 +206,9 @@ class DisplayConfig():
     def max_screen_height(self):
         return self.resources[5]
 
+    @property
+    def monitors_count(self):
+        return len(self.current_state[1])
     
     def available_modes(self, monitor):
         # print("Available Monitor Modes")
@@ -247,7 +250,7 @@ class DisplayConfig():
         #     print(val)
         # print('------------------------')
         print("Serial: %s" % serial)
-        print("Monitors num:",len(monitors))
+        print("Monitors num:",self.monitors_count)
         for monitor in monitors:
             print("Available Monitor Modes")
             print(self.available_modes(monitor))
@@ -347,7 +350,7 @@ if __name__ == "__main__":
 
     # print('====================')
     # display_config.print_resources()
-    # display_config.apply_monitors_config()
+    display_config.apply_monitors_config()
     # display_config = DisplayConfig()
 
 
