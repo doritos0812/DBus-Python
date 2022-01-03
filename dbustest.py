@@ -1,9 +1,12 @@
 """DBus backed display management for Mutter"""
 from collections import defaultdict
 from logging import currentframe
-
+from Xlib import display
 import dbus
+from dbus.mainloop.glib import DBusGMainLoop
+from gi.repository import GLib
 
+DBusGMainLoop(set_as_default = True)
 
 class DisplayMode:
     def __init__(self, mode_info):
@@ -203,23 +206,41 @@ class DisplayConfig():
     def max_screen_height(self):
         return self.resources[5]
 
-    def print_monitor(self, monitor):
+    def print_monitor_config(self, monitor):
+        print("Print Monitor Config")
         monitor_info, modes, props = monitor
         print(' '.join(monitor_info))
         for mode in modes:
+            # print(mode[0])
             d_mode = DisplayMode(mode)
             if d_mode.is_current():
-                print(str(d_mode))
+                print("Current: ",str(d_mode))
         print(props)
+
+    # def print_monitor_resources(self, monitor):
+    #     print("Print Monitor Resources")
+    #     print(monitor[0])
+    #     print(monitor[1])
+    #     print(monitor[2])
+    #     print(monitor[3])
+    #     print(monitor[4])
+    #     print(monitor[5])
+    #     print(monitor[6])
+    #     print(monitor[7])
+    #     print(monitor[8])
+    #     print(monitor[9])
+
+
+
     def print_current_state(self):
         serial, monitors, logical_monitors, properties = self.current_state
         # for val in self.current_state:
         #     print(val)
         # print('------------------------')
         print("Serial: %s" % serial)
-        print("Monitors")
+        print("Monitors num:",len(monitors))
         for monitor in monitors:
-            self.print_monitor(monitor)
+            self.print_monitor_config(monitor)
         print("Logical monitors")
         for monitor in logical_monitors:
             print(monitor)
@@ -227,18 +248,20 @@ class DisplayConfig():
         for prop in properties:
             print("%s: %s" % (prop, properties[prop]))
 
-    def print_resources(self):
-        serial, monitors, logical_monitors, properties = self.resources
-        print("Serial: %s" % serial)
-        print("Monitors")
-        for monitor in monitors:
-            self.print_monitor(monitor)
-        print("Logical monitors")
-        for monitor in logical_monitors:
-            print(monitor)
-        print("PROPS")
-        for prop in properties:
-            print("%s: %s" % (prop, properties[prop]))
+    # def print_resources(self):
+    #     print(len(self.resources))
+    #     serial, monitors, logical_monitors, properties, max_screen_width, max_screen_height = self.resources
+    #     print("Serial: %s" % serial)
+    #     print("Monitors")
+    #     for monitor in monitors:
+    #         print(monitor)
+    #         self.print_monitor_resources(monitor)
+    #     print("Logical monitors")
+    #     for monitor in logical_monitors:
+    #         print(monitor)
+    #     print("PROPS")
+    #     for prop in properties:
+    #         print("%s: %s" % (prop, properties[prop]))
 
     def apply_monitors_config(self):
         scale = dbus.Double(1.0)
@@ -268,10 +291,60 @@ class DisplayConfig():
             monitors,
             {}
         )
+    
+    def single_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
+        monitors = [
+            [
+                x_position,
+                y_position,
+                scale,
+                transform,
+                is_primary,
+                monitor_list
+            ]
+        ]
+    
+    def extand_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
+        monitors = [
+            [
+                x_position,
+                y_position,
+                scale,
+                transform,
+                is_primary,
+                monitor_list
+            ]
+        ]
+
+    def clone_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
+        monitors = [
+            [
+                x_position,
+                y_position,
+                scale,
+                transform,
+                is_primary,
+                monitor_list
+            ]
+        ]
 
 
 if __name__ == "__main__":
     display_config = DisplayConfig()
     # display_config.print_monitor()
     display_config.print_current_state()
-    display_config.apply_monitors_config()
+    # print('====================')
+    # display_config.print_resources()
+    # display_config.apply_monitors_config()
+    # display_config = DisplayConfig()
+
+    def catchcall_signal_handler(*args, **kwargs):
+        display_config = DisplayConfig()
+        display_config.print_current_state()
+        
+
+    bus = dbus.SessionBus()
+    bus.add_signal_receiver(catchcall_signal_handler, dbus_interface="org.gnome.Mutter.DisplayConfig", signal_name='MonitorsChanged')
+
+    loop = GLib.MainLoop()
+    loop.run()
