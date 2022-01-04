@@ -217,11 +217,10 @@ class DisplayConfig():
         return mode_list
 
     def get_monitor_serial(self):
-        serial_list = []
+        serial_list = [None]
         for i in range(self.monitors_count):
             serial_list.append(self.outputs[i][7]['product'] + ' ' + self.outputs[i][7]['serial'])
         return serial_list
-
 
     def print_monitor_config(self, monitor):
         print("Print Monitor Config")
@@ -349,22 +348,27 @@ class DisplayConfig():
                     True if i == 0 else False,
                     [monitor_list[i]]
                 ])
+
+        # TODO: Extand Location Set. Current is just right side extand...
             x_position += monitor_width_height[i][0]
+
         # print(monitors)
         return monitors
 
 
     def clone_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
-        monitors = [
-            [
+        count = self.monitors_count
+        monitors = []
+        monitors.append([
                 x_position,
                 y_position,
                 scale,
                 transform,
-                is_primary,
-                monitor_list
-            ]
-        ]
+                True,
+                [monitor_list[i] for i in range(count)]
+            ])
+        # print(monitors)
+        return monitors
 
 
 if __name__ == "__main__":
@@ -375,13 +379,15 @@ if __name__ == "__main__":
     # print(display_config.crtcs[0][4])
     # print('====================')
     # display_config.print_resources()
-    # display_config.apply_monitors_config()
+
     # display_config = DisplayConfig()
 
     print(display_config.outputs[0][7]['product'],display_config.outputs[0][7]['serial'])
     print(display_config.get_monitor_serial())
+    print(display_config.clone_mode(0,0,dbus.Double(1.0),dbus.UInt32(0),True,[[dbus.String('DP-1'), dbus.String('1920x1200@59.950172424316406'), {}], 
+                                                                            [dbus.String('HDMI-1'), dbus.String('1920x1200@59.950172424316406'), {}]]))
 
-
+    display_config.apply_monitors_config()
     # # --------- DBus Loop -----------
     # def catchcall_signal_handler(*args, **kwargs):
     #     display_config = DisplayConfig()
