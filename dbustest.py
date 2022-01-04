@@ -281,24 +281,29 @@ class DisplayConfig():
         scale = dbus.Double(1.0)
         transform = dbus.UInt32(0)
         is_primary = True
-        monitors = [
-            [
-                0,
-                0,
-                scale,
-                transform,
-                is_primary,
-                [[dbus.String('DP-1'), dbus.String('1920x1200@59.950172424316406'), {}]]
-            ],
-            # [
-            #     1920,
-            #     0,
-            #     scale,
-            #     transform,
-            #     False,
-            #     [[dbus.String('HDMI-1'), dbus.String('1920x1200@59.950172424316406'), {}]]
-            # ]
-        ]
+        monitors = self.extand_mode(0,0,dbus.Double(1.0),dbus.UInt32(0),True,[[dbus.String('DP-1'), dbus.String('1920x1200@59.950172424316406'), {}], 
+                                                                            [dbus.String('HDMI-1'), dbus.String('1920x1200@59.950172424316406'), {}]])
+        
+
+        # monitors = [
+        #     [
+        #         0,
+        #         0,
+        #         scale,
+        #         transform,
+        #         is_primary,
+        #         [[dbus.String('DP-1'), dbus.String('1920x1200@59.950172424316406'), {}]]
+        #     ],
+        #     # [
+        #     #     1920,
+        #     #     0,
+        #     #     scale,
+        #     #     transform,
+        #     #     False,
+        #     #     [[dbus.String('HDMI-1'), dbus.String('1920x1200@59.950172424316406'), {}]]
+        #     # ]
+        # ]
+
         self.interface.ApplyMonitorsConfig(
             self.config_serial,
             1,
@@ -307,6 +312,7 @@ class DisplayConfig():
         )
     
     def single_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
+        count = self.monitors_count
         monitors = [
             [
                 x_position,
@@ -317,18 +323,24 @@ class DisplayConfig():
                 monitor_list
             ]
         ]
+        return monitors
     
+
     def extand_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
-        monitors = [
-            [
-                x_position,
-                y_position,
-                scale,
-                transform,
-                is_primary,
-                monitor_list
-            ]
-        ]
+        count = self.monitors_count
+        monitors = []
+        for i in range(count):
+            monitors.append([
+                    0,
+                    1200 * i,
+                    scale,
+                    transform,
+                    True if i == 0 else False,
+                    [monitor_list[i]]
+                ])
+        # print(monitors)
+        return monitors
+
 
     def clone_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
         monitors = [
@@ -346,7 +358,7 @@ class DisplayConfig():
 if __name__ == "__main__":
     display_config = DisplayConfig()
     # display_config.print_monitor()
-    display_config.print_current_state()
+    # display_config.print_current_state()
 
     # print('====================')
     # display_config.print_resources()
