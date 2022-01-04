@@ -216,6 +216,11 @@ class DisplayConfig():
         mode_list = [str(mode[0]) for mode in modes]
         return mode_list
 
+    def get_monitor_serial(self):
+        serial_list = []
+        for i in range(self.monitors_count):
+            serial_list.append(self.outputs[i][7]['product'] + ' ' + self.outputs[i][7]['serial'])
+        return serial_list
 
 
     def print_monitor_config(self, monitor):
@@ -311,33 +316,40 @@ class DisplayConfig():
             {}
         )
     
-    def single_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
-        count = self.monitors_count
-        monitors = [
-            [
-                x_position,
-                y_position,
-                scale,
-                transform,
-                is_primary,
-                monitor_list
-            ]
-        ]
-        return monitors
+    # def single_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
+    #     count = self.monitors_count
+    #     monitors =[
+    #         [
+    #             x_position,
+    #             y_position,
+    #             scale,
+    #             transform,
+    #             is_primary,
+    #             monitor_list
+    #         ]
+    #     ]
+    #     return monitors
     
 
     def extand_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
         count = self.monitors_count
+
+        # crtcs[i] = i'th monitor config
+        # crtcs[i][4] = current width setting
+        # crtcs[i][5] = current height setting
+        monitor_width_height = [[self.crtcs[i][4],self.crtcs[i][5]] for i in range(count)]
+
         monitors = []
         for i in range(count):
             monitors.append([
-                    0,
-                    1200 * i,
+                    x_position,
+                    y_position,
                     scale,
                     transform,
                     True if i == 0 else False,
                     [monitor_list[i]]
                 ])
+            x_position += monitor_width_height[i][0]
         # print(monitors)
         return monitors
 
@@ -359,14 +371,15 @@ if __name__ == "__main__":
     display_config = DisplayConfig()
     # display_config.print_monitor()
     # display_config.print_current_state()
-
+    # print(display_config.current_state[1][0][1][0][1]) # monitors, first monitor, modes, current mode , width
+    # print(display_config.crtcs[0][4])
     # print('====================')
     # display_config.print_resources()
-    display_config.apply_monitors_config()
+    # display_config.apply_monitors_config()
     # display_config = DisplayConfig()
 
-
-
+    print(display_config.outputs[0][7]['product'],display_config.outputs[0][7]['serial'])
+    print(display_config.get_monitor_serial())
 
 
     # # --------- DBus Loop -----------
