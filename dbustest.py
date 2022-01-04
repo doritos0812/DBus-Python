@@ -315,19 +315,19 @@ class DisplayConfig():
             {}
         )
     
-    # def single_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
-    #     count = self.monitors_count
-    #     monitors =[
-    #         [
-    #             x_position,
-    #             y_position,
-    #             scale,
-    #             transform,
-    #             is_primary,
-    #             monitor_list
-    #         ]
-    #     ]
-    #     return monitors
+    def single_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list, monitor_num):
+        count = self.monitors_count
+        monitors =[
+            [
+                x_position,
+                y_position,
+                scale,
+                transform,
+                is_primary,
+                [monitor_list[monitor_num]]
+            ]
+        ]
+        return monitors
     
 
     def extand_mode(self, x_position, y_position, scale, transform, is_primary, monitor_list):
